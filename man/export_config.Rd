@@ -6,7 +6,7 @@
 \usage{
 export_config(
   config_file,
-  model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake"),
+  model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
   dirs = TRUE,
   time = TRUE,
   location = TRUE,
@@ -23,7 +23,7 @@ export_config(
 \item{config_file}{name of the master LakeEnsemblR config file}
 
 \item{model}{vector; model to export configuration file for.
-Options include c("GOTM", "GLM", "Simstrat", "FLake", "MyLake")}
+Options include c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water")}
 
 \item{dirs}{boolean; create directories for each model and if needed copies templates.
 Calls export_dirs. Defaults to TRUE}

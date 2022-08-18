@@ -17,7 +17,7 @@
 #'@export
 
 export_model_parameters <- function(config_file,
-                              model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake"),
+                              model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
                               folder = "."){
   # Set working directory
   oldwd <- getwd()

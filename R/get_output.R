@@ -785,4 +785,23 @@ get_output <- function(config_file, model, vars, obs_depths = NULL, folder = "."
 
     return(mylake_out)
   }
+  ##--------------------------- air2water -----------------------------------------
+  if("air2water" %in% model) {
+    
+    # Extract output
+    fold <- file.path(folder, "air2water")
+    
+    out_depths <- get_yaml_value(config_file, "output", "depths")
+    depths <- 0
+    
+    
+    a2w_out <- air2wateR::get_outputs(fold)
+
+    a2w_out <- read_flake_out(output = file.path(folder, "FLake", "output", "output.dat"),
+                              vars = vars, depths = depths, folder = fold, nml_file = nml_file,
+                              out_time = out_time, out_hour = out_hour)
+    
+    return(a2w_out)
+  }
+  
 }

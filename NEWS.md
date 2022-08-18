@@ -1,3 +1,12 @@
+## version 1.2.0
+
+### Changes
+
+ - added new model air2water
+ - to be used the model requires the R package air2wateR which can be installed from github.com/aemon-j/air2wateR
+ - as air2water uses its own calibration method it is at the moment not included in the 'cali_ensemble()' function
+
+
 ## version 1.1.3
 
 ### Changes

@@ -4,7 +4,7 @@
 #'
 #'@param config_file name of the master LakeEnsemblR config file
 #'@param model vector; model to export configuration file for.
-#'  Options include c("GOTM", "GLM", "Simstrat", "FLake", "MyLake")
+#'  Options include c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water")
 #'@param dirs boolean; create directories for each model and if needed copies templates.
 #'  Calls export_dirs. Defaults to TRUE
 #'@param time boolean; exports time settings. Calls export_time. Defaults to TRUE.
@@ -30,7 +30,7 @@
 #'
 #'@export
 
-export_config <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake"),
+export_config <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
                           dirs = TRUE, time = TRUE, location = TRUE,
                           output_settings = TRUE, meteo = TRUE, init_cond = TRUE,
                           extinction = TRUE, flow = TRUE, model_parameters = TRUE,
@@ -72,10 +72,6 @@ export_config <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLa
     export_time(config_file = config_file, model = model, folder = folder)
   }
 
-  # Export hypsograph, lat/lon, ice
-  if(location){
-    export_location(config_file = config_file, model = model, folder = folder)
-  }
 
   # Export output_settings (depth and time intervals)
   if(output_settings){
@@ -87,6 +83,11 @@ export_config <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLa
     export_meteo(config_file = config_file, model = model, folder = folder)
   }
 
+  # Export hypsograph, lat/lon, ice
+  if(location){
+    export_location(config_file = config_file, model = model, folder = folder)
+  }
+  
   # Export initial conditions
   if(init_cond){
     export_init_cond(config_file = config_file, model = model, print = TRUE, folder = folder)

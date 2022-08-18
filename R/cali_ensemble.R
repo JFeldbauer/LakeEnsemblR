@@ -72,6 +72,11 @@ cali_ensemble <- function(config_file, num = NULL, param_file = NULL, cmethod = 
                           folder = ".", spin_up = NULL, out_f = "cali", ...) {
 
 
+  if("air2water" %in% model) {
+    warning(paste0("Calibration of air2water is currently not supported as the model ",
+                   "contains its own calibration method which is called upon .",
+                   "using 'export_config()'"))
+  }
   # ---- Send to RStudio Jobs -----
   if (!missing(job_name)) {
     if (make.names(job_name) != job_name) {

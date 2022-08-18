@@ -22,6 +22,7 @@ get_template <- function(template = NULL, folder = ".", filename = NULL, overwri
   name_gotm <- "gotm.yaml" # Name in GOTMr
   name_simstrat <- "simstrat.par" # Name in SimstratR
   name_mylake <- "mylake.Rdata" # Name in MyLakeR
+  name_air2water <- "input.txt"
   name_init_temp_profile <- "LakeEnsemblR_init_temp_profile_template.csv"
   name_Kw <- "LakeEnsemblR_Kw_template.csv"
   name_inflow <- "feeagh/LakeEnsemblR_inflow_standard.csv"
@@ -37,6 +38,7 @@ get_template <- function(template = NULL, folder = ".", filename = NULL, overwri
                  name_gotm,
                  name_simstrat,
                  name_mylake,
+                 name_air2water,
                  name_init_temp_profile,
                  name_Kw,
                  name_inflow,
@@ -50,7 +52,8 @@ get_template <- function(template = NULL, folder = ".", filename = NULL, overwri
     message("You need to specify what you want a template for. \nOptions are:\n",
             "all", "\nLakeEnsemblR_config", "\nFLake_config", "\nGLM_config",
             "\nGOTM_config", "\nSimstrat_config", "\nMyLake_config",
-            "\nInitial temperature profile", "\nLight extinction", "\nInflow",
+            "\nair2water_config", "\nInitial temperature profile",
+            "\nLight extinction", "\nInflow",
             "\nOutflow", "\nHypsograph", "\nIce height", "\nMeteo",
             "\nTemperature observations")
   }else if(template == "LakeEnsemblR_config"){
@@ -113,6 +116,17 @@ get_template <- function(template = NULL, folder = ".", filename = NULL, overwri
     }else{
       message("To retrieve the MyLake config file, you need to install ",
               "the R package 'MyLakeR'.")
+    }
+  }else if(template == "air2water_config"){
+    if("air2wateR" %in% rownames(installed.packages())){
+      use_name <- ifelse(is.null(filename), basename(name_air2water), filename)
+      air2water_folder <- system.file("extdata", package = "air2wateR")
+      file.copy(file.path(air2water_folder, name_air2water),
+                file.path(folder, use_name),
+                overwrite = overwrite)
+    }else{
+      message("To retrieve the air2water config file, you need to install ",
+              "the R package 'air2wateR'.")
     }
   }else if(template == "Initial temperature profile"){
     use_name <- ifelse(is.null(filename), basename(name_init_temp_profile), filename)

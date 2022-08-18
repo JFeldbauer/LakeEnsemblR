@@ -394,4 +394,18 @@ format_met <- function(met, model, config_file, folder = "."){
 
     return(mylake_met)
   }
+  ##------------------------------- air2water -----------------------------------------------------------
+  
+  if("air2water" %in% model) {
+    
+    air2water_met <- met
+    
+    
+    air2water_met <- air2water_met[, c(l_names$time,
+                                       l_names$airt)]
+    
+    
+    
+    return(air2water_met)
+  }
 }

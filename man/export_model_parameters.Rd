@@ -6,7 +6,7 @@
 \usage{
 export_model_parameters(
   config_file,
-  model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake"),
+  model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
   folder = "."
 )
 }

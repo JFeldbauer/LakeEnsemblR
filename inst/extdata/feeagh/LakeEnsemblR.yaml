@@ -16,6 +16,7 @@ config_files:
    Simstrat: Simstrat/simstrat.par              # Simstrat config file [json-format file]
    FLake: FLake/flake.nml                       # FLake config file [nml file]
    MyLake: MyLake/mylake.Rdata                  # MyLake config file [Rdata file]
+   air2water: air2water/input.txt               # air2water config file [Rdata file]
 observations:
    temperature:
       file: LakeEnsemblR_wtemp_profile_standard.csv         # file with observed water temperature profiles, with column headers according to LakeEnsemblR vocabulary [csv file; if none use NULL or leave empty]

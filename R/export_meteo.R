@@ -9,7 +9,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' export_meteo(model = c('GOTM', 'GLM', 'Simstrat', 'FLake'),
+#' export_meteo(model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
 #'              meteo_file = 'LakeEnsemblR_meteo_standard.csv')
 #' }
 #' @importFrom gotmtools get_yaml_value calc_cc input_yaml calc_in_lwr
@@ -18,7 +18,7 @@
 #' @importFrom lubridate floor_date seconds
 #'
 #' @export
-export_meteo <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake"),
+export_meteo <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
                          folder = "."){
 
   # check model input
@@ -76,7 +76,7 @@ export_meteo <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLak
   }
 
 
-  # FLake
+  ## FLake
   #####
   if("FLake" %in% model){
 
@@ -103,7 +103,7 @@ export_meteo <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLak
 
   }
 
-  # GLM
+  ## GLM
   #####
   if("GLM" %in% model){
     glm_met <- format_met(met = met, model = "GLM", config_file = config_file)
@@ -215,6 +215,55 @@ export_meteo <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLak
     message("MyLake: Created file ", file.path(folder, "MyLake", met_outfile))
   }
 
+  ## air2water
+  if("air2water" %in% model){
+    
+    lakename <- get_yaml_value(config_file, "location", "name")
+    # If met_timestep is not 24 hours, air2water would crash
+    # If met_timestep is lower than 24 hours, met is averaged to 24 hours
+    if(met_timestep < 86400){
+      warning("Meteo time step less than daily; averaging met file for air2water simulation.")
+      met_temp <- aggregate(met,
+                            by = list(lubridate::floor_date(met$datetime, unit = "days")),
+                            FUN = mean)
+      met_temp$datetime <- NULL
+      colnames(met_temp)[1] <- "datetime"
+    }else if(met_timestep > 86400){
+      stop("air2water cannot be run with meteo forcing time steps larger than 1 day.")
+    }else{
+      met_temp <- met
+    }
+    met_outfile <- paste0("stndrck_", lakename, "_", c("cc", "cv"), ".txt")
+    
+    # split data in calibration an validation period
+    length_met <- length(met_temp$datetime)/365.25
+    # if only one year is available no validation is done
+    if(length_met <= 1) {
+      met_temp_cc <- met_temp
+      met_temp_cv <- met_temp
+    } else {
+      met_temp_cc <- met_temp[(1:floor(length(met_temp$datetime)/2)), ]
+      met_temp_cv <- met_temp[(floor(length(met_temp$datetime)/2)+1):length(met_temp$datetime), ]
+    }
+    
+    
+    par_file <- file.path(folder, get_yaml_value(config_file, "config_files", "air2water"))
+    
+    met_outfpath <- file.path(folder, "air2water", lakename, met_outfile)
+    
+    a2w_met_cc <- format_met(met = met_temp_cc, model = "air2water", config_file = config_file)
+    a2w_met_cv <- format_met(met = met_temp_cv, model = "air2water", config_file = config_file)
+    
+    # Write meteo file, potentially with the scaling factors in the config_file
+    # Using create_scaling_factors in the helpers.R script
+    scale_param <- create_scaling_factors(config_file, "air2water", folder)
+    scale_met(met = a2w_met_cc, pars = scale_param, model = "air2water", out_file = met_outfpath[1])
+    scale_met(met = a2w_met_cv, pars = scale_param, model = "air2water", out_file = met_outfpath[2])
+    
+    
+    message("air2water: Created files ", file.path(folder, "air2water", met_outfile))
+  }
+  
   # Set the timezone back to the original
   Sys.setenv(TZ = original_tz)
 

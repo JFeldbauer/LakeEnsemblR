@@ -5,7 +5,7 @@
 #'
 #'@param config_file name of the master LakeEnsemblR config file
 #'@param model vector; model to export configuration file.
-#'  Options include c("GOTM", "GLM", "Simstrat", "FLake", "MyLake")
+#'  Options include c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water")
 #'@param folder folder
 #'@keywords methods
 #'@examples
@@ -16,7 +16,7 @@
 #'
 #'@export
 
-export_location <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake"),
+export_location <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
                         folder = "."){
   # Set working directory
   oldwd <- getwd()
@@ -249,6 +249,41 @@ export_location <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "F
     temp_fil <- gsub(".*/", "", get_yaml_value(config_file, "config_files", "MyLake"))
     save(mylake_config, file = file.path(folder, "MyLake", temp_fil))
   }
+
+  ##------------- air2water --------------
+  
+  if("air2water" %in% model){
+    
+    # Calculate mean depth from hypsograph (mdepth = V / SA)
+    # Calculate volume from hypsograph - converted to function?
+    ## Needs to be double checked!
+    bth_area <- hyp$Area_meterSquared
+    bth_depth <- hyp$Depth_meter
+    
+    
+    top <- min(bth_depth)
+    bottom <- max(bth_depth)
+    layer_d <- seq(top, bottom, 0.1)
+    layer_a <- stats::approx(bth_depth, bth_area, layer_d)$y
+    # if init depth is smaller than max depth change hypsograph
+    if(init_depth < max_depth) {
+      layer_a <- layer_a[(init_depth + (layer_d - max_depth)) >= 0]
+      layer_d <- layer_d[(init_depth + (layer_d - max_depth)) >= 0]
+      layer_d <- layer_d - min(layer_d)
+    }
+    vols <- c()
+    for(i in 2:length(layer_d)){
+      h <- layer_d[i] - layer_d[i - 1]
+      cal_v <- (h / 3) * (layer_a[i] + layer_a[i - 1] + sqrt(layer_a[i] * layer_a[i - 1]))
+      vols <- c(vols, cal_v)
+    }
+    vol <- sum(vols)
+    mean_depth <- signif((vol / layer_a[1]), 4)
+    ##
+
+    air2wateR::gen_param("air2water", mean_depth = mean_depth)
+  }
+  
 
   message("export_location complete!")
 }

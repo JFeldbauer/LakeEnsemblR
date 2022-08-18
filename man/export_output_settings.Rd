@@ -6,7 +6,7 @@
 \usage{
 export_output_settings(
   config_file,
-  model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake"),
+  model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
   folder = "."
 )
 }
@@ -14,7 +14,7 @@ export_output_settings(
 \item{config_file}{name of the master LakeEnsemblR config file}
 
 \item{model}{vector; model to export configuration file.
-Options include c("GOTM", "GLM", "Simstrat", "FLake", "MyLake")}
+Options include c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water")}
 
 \item{folder}{folder}
 }

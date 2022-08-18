@@ -20,7 +20,7 @@
 #' @importFrom configr read.config
 #'
 #' @export
-run_ensemble <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake"),
+run_ensemble <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
                          folder = ".", verbose = FALSE, parallel = FALSE,
                          return_list = FALSE, create_output = TRUE, add = FALSE){
 
@@ -476,4 +476,31 @@ run_ensemble <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLak
     }
   }
   return(mylake_out)
+}
+
+#' @keywords internal
+.run_air2water <- function(config_file, folder, return_list, create_output, start, stop,
+                        verbose, obs_deps, out_time, out_vars){
+  
+  cnfg_file <- gsub(".*/", "", gotmtools::get_yaml_value(config_file, "config_files", "air2water"))
+  air2wateR::run_air2water(sim_folder = folder, mode = "forward", use_pars = TRUE)
+  
+  message("air2water run is complete! ", paste0("[", Sys.time(), "]"))
+  
+  if(return_list | create_output){
+    
+    ### Extract output
+    air2water_out <- get_output(config_file = config_file, model = "MyLake", vars = out_vars,
+                                obs_depths = obs_deps, folder = folder)
+    
+    if(!is.list(air2water_out)) {
+      air2water_out <- merge(air2water_out, out_time, by = "datetime", all.y = T)
+    } else {
+      air2water_out <- lapply(seq_len(length(air2water_out)), function(x){
+        merge(air2water_out[[x]], out_time, by = 1, all.y = T)
+      })
+      names(air2water_out) <- out_vars # Re-assign names to list
+    }
+  }
+  return(air2water_out)
 }

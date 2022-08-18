@@ -6,7 +6,7 @@
 \usage{
 check_master_config(
   config_file,
-  model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake"),
+  model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
   exp_cnf = FALSE
 )
 }

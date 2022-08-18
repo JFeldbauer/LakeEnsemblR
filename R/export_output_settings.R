@@ -5,7 +5,7 @@
 #'
 #'@param config_file name of the master LakeEnsemblR config file
 #'@param model vector; model to export configuration file.
-#'  Options include c("GOTM", "GLM", "Simstrat", "FLake", "MyLake")
+#'  Options include c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water")
 #'@param folder folder
 #'@keywords methods
 #'@examples
@@ -16,7 +16,7 @@
 #'@export
 
 export_output_settings <- function(config_file,
-                                   model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake"),
+                                   model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
                                    folder = "."){
   # Set working directory
   oldwd <- getwd()

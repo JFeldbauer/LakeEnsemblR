@@ -6,7 +6,7 @@
 \usage{
 export_meteo(
   config_file,
-  model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake"),
+  model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
   folder = "."
 )
 }
@@ -23,7 +23,7 @@ Export driver files for each model
 }
 \examples{
 \dontrun{
-export_meteo(model = c('GOTM', 'GLM', 'Simstrat', 'FLake'),
+export_meteo(model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
              meteo_file = 'LakeEnsemblR_meteo_standard.csv')
 }
 }

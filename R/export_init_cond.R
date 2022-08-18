@@ -5,7 +5,7 @@
 #' @name export_init_cond
 #' @param config_file filepath; to LakeEnsemblr yaml master config file
 #' @param model vector; model to export driving data.
-#'   Options include c('GOTM', 'GLM', 'Simstrat', 'FLake')
+#'   Options include c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water")
 #' @param date character; Date in "YYYY-mm-dd HH:MM:SS" format to extract the initial profile.
 #'   If NULL, the observations file specified in config_file is used to extract the date.
 #' @param print logical; Prints the temperature profile to the console
@@ -17,7 +17,7 @@
 #' @export
 
 export_init_cond <- function(config_file,
-                             model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake"),
+                             model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
                              date = NULL, print = TRUE, folder = "."){
   
   # Set working directory

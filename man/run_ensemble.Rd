@@ -6,7 +6,7 @@
 \usage{
 run_ensemble(
   config_file,
-  model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake"),
+  model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
   folder = ".",
   verbose = FALSE,
   parallel = FALSE,

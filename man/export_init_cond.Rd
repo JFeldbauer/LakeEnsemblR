@@ -6,7 +6,7 @@
 \usage{
 export_init_cond(
   config_file,
-  model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake"),
+  model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
   date = NULL,
   print = TRUE,
   folder = "."
@@ -16,7 +16,7 @@ export_init_cond(
 \item{config_file}{filepath; to LakeEnsemblr yaml master config file}
 
 \item{model}{vector; model to export driving data.
-Options include c('GOTM', 'GLM', 'Simstrat', 'FLake')}
+Options include c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water")}
 
 \item{date}{character; Date in "YYYY-mm-dd HH:MM:SS" format to extract the initial profile.
 If NULL, the observations file specified in config_file is used to extract the date.}

@@ -10,7 +10,7 @@
 #' @export
 
 check_master_config <- function(config_file,
-                                model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake"),
+                                model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
                                 exp_cnf = FALSE) {
 
 
@@ -69,6 +69,12 @@ check_master_config <- function(config_file,
        "MyLake" %in% model) {
       stop(paste0("MyLake control file ",
                   gotmtools::get_yaml_value(config_file, "config_files", "MyLake"),
+                  " is not existing"))
+    }
+    if(!file.exists(get_yaml_value(config_file, "config_files", "air2water")) &&
+       "air2water" %in% model) {
+      stop(paste0("air2water control file ",
+                  gotmtools::get_yaml_value(config_file, "config_files", "air2water"),
                   " is not existing"))
     }
     }
@@ -196,18 +202,26 @@ check_master_config <- function(config_file,
   }
 
   # issue a warning if dens is used together with models that don't directly give dens output
-  if("dens" %in% variables & any(c("MyLake", "FLake") %in% model)) {
-    warning(paste0("Models ", paste0(model[model %in% c("MyLake", "FLake")], collapse = " and "),
+  if("dens" %in% variables & any(c("MyLake", "FLake", "air2water") %in% model)) {
+    warning(paste0("Models ", paste0(model[model %in% c("MyLake", "FLake", "air2water")], collapse = " and "),
                    " do not directly output density and the results in the output ncdf file ",
                    "are calculated from the models temperature output."))
   }
 
   # issue a warning if sens is used together with models that don't give sens output
-  if("salt" %in% variables & any(c("MyLake", "FLake") %in% model)) {
-    warning(paste0("Models ", paste0(model[model %in% c("MyLake", "FLake")], collapse = " and "),
+  if("salt" %in% variables & any(c("MyLake", "FLake", "air2water") %in% model)) {
+    warning(paste0("Models ", paste0(model[model %in% c("MyLake", "FLake", "air2water")], collapse = " and "),
                    " do not output salinity and the results in the output ncdf file ",
                    "are just NAs."))
   }
+  
+  # issue a warning if sens is used together with models that don't give sens output
+  if("w_level" %in% variables & any(c("MyLake", "FLake", "air2water") %in% model)) {
+    warning(paste0("Models ", paste0(model[model %in% c("MyLake", "FLake", "air2water")], collapse = " and "),
+                   " do not output water level and the results in the output ncdf file ",
+                   "are just NAs."))
+  }
+  
 }
 
 
@@ -222,7 +236,7 @@ check_models <- function(model, check_package_install = FALSE){
   }
 
   # available models
-  av_models <- c("Simstrat", "GOTM", "GLM", "FLake", "MyLake")
+  av_models <- c("Simstrat", "GOTM", "GLM", "FLake", "MyLake", "air2water")
 
   # test if the supplied models are allowed
   if(any(!model %in% av_models)){
@@ -241,7 +255,8 @@ check_models <- function(model, check_package_install = FALSE){
                            "GLM" = "GLM3r",
                            "GOTM" = "GOTMr",
                            "Simstrat" = "SimstratR",
-                           "MyLake" = "MyLakeR")
+                           "MyLake" = "MyLakeR",
+                           "air2water" = "air2wateR")
 
     check_package_installation <- function(model){
       if(isFALSE(requireNamespace(model_packages[[model]], quietly = TRUE))){
