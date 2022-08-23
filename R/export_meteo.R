@@ -16,6 +16,7 @@
 #' @importFrom glmtools read_nml set_nml write_nml
 #' @importFrom zoo na.approx
 #' @importFrom lubridate floor_date seconds
+#' @importFrom dplyr left_join
 #'
 #' @export
 export_meteo <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLake", "MyLake", "air2water"),
@@ -76,7 +77,7 @@ export_meteo <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLak
   }
 
 
-  ## FLake
+  ##---------------- FLake ------------------------
   #####
   if("FLake" %in% model){
 
@@ -103,7 +104,7 @@ export_meteo <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLak
 
   }
 
-  ## GLM
+  ##----------------------- GLM ------------------------
   #####
   if("GLM" %in% model){
     glm_met <- format_met(met = met, model = "GLM", config_file = config_file)
@@ -127,7 +128,7 @@ export_meteo <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLak
 
   }
 
-  ## GOTM
+  ##------------------------- GOTM ------------------------------
   if("GOTM" %in% model){
 
     yaml <- file.path(folder, get_yaml_value(config_file, "config_files", "GOTM"))
@@ -163,7 +164,7 @@ export_meteo <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLak
 
   }
 
-  ## Simstrat
+  ##------------------------------ Simstrat -------------------------------------------
   if("Simstrat" %in% model){
 
     met_outfile <- "meteo_file.dat"
@@ -184,7 +185,7 @@ export_meteo <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLak
     message("Simstrat: Created file ", file.path(folder, "Simstrat", met_outfile))
   }
 
-  ## MyLake
+  ##---------------------------------- MyLake -------------------------------------
   if("MyLake" %in% model){
 
     met_outfile <- "meteo_file.dat"
@@ -215,10 +216,19 @@ export_meteo <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLak
     message("MyLake: Created file ", file.path(folder, "MyLake", met_outfile))
   }
 
-  ## air2water
+  ##----------------------- air2water -----------------------------------------
   if("air2water" %in% model){
     
     lakename <- get_yaml_value(config_file, "location", "name")
+    start <- get_yaml_value(config_file, "time", "start")
+    # the time sseries must start at 1st of January
+    if (lubridate::month(as.POSIXct(start)) != 1 |
+        lubridate::day(as.POSIXct(start)) != 1) {
+      stop(paste0("Timeseries for air2water must start at 1st of January ",
+                  "please start the simulation at the 1st of January if ",
+                  "you want to include air2water"))
+    }
+    stop <- get_yaml_value(config_file, "time", "stop")
     # If met_timestep is not 24 hours, air2water would crash
     # If met_timestep is lower than 24 hours, met is averaged to 24 hours
     if(met_timestep < 86400){
@@ -233,26 +243,54 @@ export_meteo <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLak
     }else{
       met_temp <- met
     }
-    met_outfile <- paste0("stndrck_", lakename, "_", c("cc", "cv"), ".txt")
+    obs_file <- get_yaml_value(config_file, "temperature", "file")
     
-    # split data in calibration an validation period
-    length_met <- length(met_temp$datetime)/365.25
-    # if only one year is available no validation is done
-    if(length_met <= 1) {
-      met_temp_cc <- met_temp
-      met_temp_cv <- met_temp
+    if(!(obs_file == "NULL" | obs_file == "")){
+      obs <- read.csv(obs_file, stringsAsFactors = FALSE)
+      obs_deps <- unique(obs$Depth_meter)
+
+      if(min(obs_deps != 0)) {
+        warning(paste0("No surface water temperature observations using measurements at ",
+                       min(obs_deps), " m for calibration of air2water."))
+      }
+      # only use closest depth to surface
+      obs <- subset(obs, obs$Depth_meter == min(obs$Depth_meter))
+      
+      obs$datetime <- as.POSIXct(obs$datetime)
+      
     } else {
-      met_temp_cc <- met_temp[(1:floor(length(met_temp$datetime)/2)), ]
-      met_temp_cv <- met_temp[(floor(length(met_temp$datetime)/2)+1):length(met_temp$datetime), ]
+      warning(paste0("No observed water temperature data available setting up air2water ",
+                     "with uncalibrated parameters."))
     }
+  
+
+    # cut to start and stop
+    met_temp <- met_temp[met_temp$datetime <= as.POSIXct(stop) & 
+                           met_temp$datetime >= as.POSIXct(start), ]
+    met_outfile <- paste0("stndrck_sat_", c("cc", "cv"), ".txt")
     
     
     par_file <- file.path(folder, get_yaml_value(config_file, "config_files", "air2water"))
     
     met_outfpath <- file.path(folder, "air2water", lakename, met_outfile)
     
-    a2w_met_cc <- format_met(met = met_temp_cc, model = "air2water", config_file = config_file)
-    a2w_met_cv <- format_met(met = met_temp_cv, model = "air2water", config_file = config_file)
+    a2w_met <- format_met(met = met_temp, model = "air2water", config_file = config_file)
+
+    a2w_met <- dplyr::left_join(a2w_met, obs, by = "datetime")
+    
+    # split data in calibration an validation period
+    length_met <- length(met_temp$datetime)/365.25
+    
+    if(length_met > 2) {
+      # the time series must start at 1st of January so find best date to split
+      ysplit <- ceiling(length_met/2)
+      dsplit <- paste0(lubridate::year(as.POSIXct(start)) + ysplit, "-01-01")
+      a2w_met_cc <- a2w_met[a2w_met$datetime < as.POSIXct(dsplit), ]
+      a2w_met_cv <- a2w_met[a2w_met$datetime >= as.POSIXct(dsplit), ]
+    } else {
+      a2w_met_cc <- a2w_met
+      a2w_met_cv <- a2w_met
+    }
     
     # Write meteo file, potentially with the scaling factors in the config_file
     # Using create_scaling_factors in the helpers.R script

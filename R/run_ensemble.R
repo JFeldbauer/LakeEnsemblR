@@ -483,14 +483,14 @@ run_ensemble <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLak
                         verbose, obs_deps, out_time, out_vars){
   
   cnfg_file <- gsub(".*/", "", gotmtools::get_yaml_value(config_file, "config_files", "air2water"))
-  air2wateR::run_air2water(sim_folder = folder, mode = "forward", use_pars = TRUE)
+  air2wateR::run_air2water(sim_folder = file.path(folder, "air2water"), mode = "forward", use_pars = FALSE)
   
   message("air2water run is complete! ", paste0("[", Sys.time(), "]"))
   
   if(return_list | create_output){
     
     ### Extract output
-    air2water_out <- get_output(config_file = config_file, model = "MyLake", vars = out_vars,
+    air2water_out <- get_output(config_file = config_file, model = "air2water", vars = out_vars,
                                 obs_depths = obs_deps, folder = folder)
     
     if(!is.list(air2water_out)) {

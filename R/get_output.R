@@ -787,20 +787,84 @@ get_output <- function(config_file, model, vars, obs_depths = NULL, folder = "."
   }
   ##--------------------------- air2water -----------------------------------------
   if("air2water" %in% model) {
+    a2w_out <- list()
     
+    if("temp" %in% vars){
     # Extract output
     fold <- file.path(folder, "air2water")
     
     out_depths <- get_yaml_value(config_file, "output", "depths")
-    depths <- 0
-    
-    
-    a2w_out <- air2wateR::get_outputs(fold)
 
-    a2w_out <- read_flake_out(output = file.path(folder, "FLake", "output", "output.dat"),
-                              vars = vars, depths = depths, folder = fold, nml_file = nml_file,
-                              out_time = out_time, out_hour = out_hour)
+    depths <- unique(c(0, min(obs_depths)))
     
+    
+    outa2w <- air2wateR::get_outputs(fold)
+    outa2w$datetime <- as.POSIXct(format(outa2w$datetime, "%Y-%m-%d"), tz = "UTC")
+    
+    
+    a2w_out[["temp"]] <- data.frame(datetime = outa2w$datetime,
+                                    wt = outa2w$LSWT_sim)
+    
+    # if there are no observations at the surface add a second column with depth of
+    # the shallowest observations to calculate fit
+    if(length(depths) > 1) {
+      a2w_out[["temp"]]$wto <- a2w_out[["temp"]]$wt
+    }
+    
+    colnames(a2w_out[["temp"]]) <- c("datetime", paste("wtr_", depths, sep = ""))
+    }
+    if("ice_height" %in% vars){
+      
+      a2w_out[[length(a2w_out) + 1]] <-
+        data.frame("datetime" = outa2w$datetime, "ice_height" = outa2w$LSWT_sim*NA)
+      names(a2w_out)[length(a2w_out)] <- "ice_height"
+      message('air2water does not support simulation of ice cover')
+      
+    }
+    
+    if("w_level" %in% vars){
+      
+      a2w_out[[length(a2w_out) + 1]] <-
+        data.frame("datetime" = outa2w$datetime, "w_level" = outa2w$LSWT_sim*NA)
+      names(a2w_out)[length(a2w_out)] <- "w_level"
+      message('air2water does not support simulation of changing water level.')
+      
+    }
+    
+    if("q_sens" %in% vars){
+      
+      a2w_out[[length(a2w_out) + 1]] <-
+        data.frame("datetime" = outa2w$datetime, "q_sens" = outa2w$LSWT_sim*NA)
+      names(a2w_out)[length(a2w_out)] <- "q_sens"
+      message('air2water does not support output of sensible heat flux.')
+      
+    }
+    
+    if("q_lat" %in% vars){
+      
+      a2w_out[[length(a2w_out) + 1]] <-
+        data.frame("datetime" = outa2w$datetime, "q_lat" = outa2w$LSWT_sim*NA)
+      names(a2w_out)[length(a2w_out)] <- "q_lat"
+      message('air2water does not support output of latent heat flux.')
+      
+    }
+    
+    if("dens" %in% vars){
+      
+      a2w_out[[length(a2w_out) + 1]] <-
+        data.frame("datetime" = outa2w$datetime, "dens" = outa2w$LSWT_sim*NA)
+      names(a2w_out)[length(a2w_out)] <- "q_lat"
+      message('air2water does not support output of density.')
+      
+    }
+    if("salt" %in% vars){
+      
+      a2w_out[[length(a2w_out) + 1]] <-
+        data.frame("datetime" = outa2w$datetime, "salt" = outa2w$LSWT_sim*NA)
+      names(a2w_out)[length(a2w_out)] <- "q_lat"
+      message('air2water does not support output of salinity')
+      
+    }
     return(a2w_out)
   }
   

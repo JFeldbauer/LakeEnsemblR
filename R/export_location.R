@@ -29,7 +29,8 @@ export_location <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "F
 
   # check model input
   model <- check_models(model)
-
+  
+  lakename <- get_yaml_value(config_file, "location", "name")
   ##-------------Read settings---------------
 
   # Latitude
@@ -280,8 +281,17 @@ export_location <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "F
     vol <- sum(vols)
     mean_depth <- signif((vol / layer_a[1]), 4)
     ##
-
+    
+    # range of parameters for calibration
     air2wateR::gen_param("air2water", mean_depth = mean_depth)
+
+    # guess for parameters without calibration
+    pars_a2w <- read.table(file.path("air2water/", lakename, "parameters.txt"),
+                       header = FALSE)
+    
+    pars_init <- apply(pars_a2w, 2, mean)
+    write.table(t(pars_init), file.path("air2water/", lakename, "parameters_forward.txt"),
+                quote = FALSE, row.names = FALSE, col.names = FALSE, fileEncoding = "ASCII")
   }
   
 

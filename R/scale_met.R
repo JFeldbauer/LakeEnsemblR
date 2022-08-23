@@ -133,14 +133,16 @@ scale_met <- function(met, pars, model, out_file = NULL) {
     #Reduce number of digits
     met[, -1] <- signif(met[, -1], digits = 8)
     
-    met <- data.frame(year = as.numeric(format(met$datetime, "%Y")),
+    met_o <- data.frame(year = as.numeric(format(met$datetime, "%Y")),
                       month = as.numeric(format(met$datetime, "%m")),
                       day = as.numeric(format(met$datetime, "%d")),
                       AT = met[[l_names$airt]],
                       WT = -999)
+    met_o$WT[!is.na(met$Water_Temperature_celsius)] <-
+      met$Water_Temperature_celsius[!is.na(met$Water_Temperature_celsius)]
     
     # Write to file
-    write.table(met, file = out_file, sep = "\t", quote = FALSE, row.names = FALSE,
+    write.table(met_o, file = out_file, sep = "\t", quote = FALSE, row.names = FALSE,
                 col.names = FALSE)
     
   }
