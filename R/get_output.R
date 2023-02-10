@@ -812,6 +812,7 @@ get_output <- function(config_file, model, vars, obs_depths = NULL, folder = "."
     
     
     outa2w <- air2wateR::get_outputs(fold)
+    outa2w <- subset(outa2w, outa2w$status == "calibration")
     outa2w$datetime <- as.POSIXct(format(outa2w$datetime, "%Y-%m-%d"), tz = "UTC")
     
     

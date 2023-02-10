@@ -278,19 +278,19 @@ export_meteo <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLak
 
     a2w_met <- dplyr::left_join(a2w_met, obs, by = "datetime")
     
-    # split data in calibration an validation period
-    length_met <- length(met_temp$datetime)/365.25
+    # # split data in calibration an validation period
+    # length_met <- length(met_temp$datetime)/365.25
     
-    if(length_met > 2) {
-      # the time series must start at 1st of January so find best date to split
-      ysplit <- ceiling(length_met/2)
-      dsplit <- paste0(lubridate::year(as.POSIXct(start)) + ysplit, "-01-01")
-      a2w_met_cc <- a2w_met[a2w_met$datetime < as.POSIXct(dsplit), ]
-      a2w_met_cv <- a2w_met[a2w_met$datetime >= as.POSIXct(dsplit), ]
-    } else {
+    # if(length_met > 2) {
+    #   # the time series must start at 1st of January so find best date to split
+    #   ysplit <- ceiling(length_met/2)
+    #   dsplit <- paste0(lubridate::year(as.POSIXct(start)) + ysplit, "-01-01")
+    #   a2w_met_cc <- a2w_met[a2w_met$datetime < as.POSIXct(dsplit), ]
+    #   a2w_met_cv <- a2w_met[a2w_met$datetime >= as.POSIXct(dsplit), ]
+    # } else {
       a2w_met_cc <- a2w_met
       a2w_met_cv <- a2w_met
-    }
+    # }
     
     # Write meteo file, potentially with the scaling factors in the config_file
     # Using create_scaling_factors in the helpers.R script
