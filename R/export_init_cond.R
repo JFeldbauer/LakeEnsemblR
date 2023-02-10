@@ -1,3 +1,4 @@
+==== BASE ====
 #' Export initial conditions into each model setup from the LakeEnsemblR standardized input for observed temperature profile
 #'
 #' Export initial condition files and input into model configuration files.
@@ -98,7 +99,15 @@ export_init_cond <- function(config_file,
     input_nml(nml_file, "SIMULATION_PARAMS", "T_wML_in", tmp[which.min(deps)])
     input_nml(nml_file, "SIMULATION_PARAMS", "T_bot_in", tmp[which.max(deps)])
     depth <- glmtools::get_nml_value(nml_file = nml_file, arg_name = "depth_w_lk")
-    hmix <- calc_hmix(tmp, deps)
+   
+    # check weather or not the mean depth is smaller than 1.5, which is
+    # the default value for the min.hmix value in calc_hmix()
+    if(depth < 1.5) {
+      mhm <- depth/2
+    } else {
+      mhm <- 1.5
+    }
+    hmix <- calc_hmix(tmp, deps, min.hmix = mhm)
     if(!is.na(hmix) & hmix < depth) {
       input_nml(nml_file, "SIMULATION_PARAMS", "h_ML_in", round(hmix, 2))
     } else {
@@ -230,3 +239,4 @@ export_init_cond <- function(config_file,
   
   message("export_init_cond complete!")
 }
+==== BASE ====

@@ -6,6 +6,48 @@
  - to be used the model requires the R package air2wateR which can be installed from github.com/aemon-j/air2wateR
  - as air2water uses its own calibration method it is at the moment not included in the 'cali_ensemble()' function
 
+## version 1.1.9
+
+### Changes
+
+- fixed a bug in the LHC calibration where if a model would crash on the first run the headding of the ouput file would be wrong
+- Add the number of rows in the hypsograph file to the calculated `max_layers` parameter in GLM, to avoid failure of Lagrangian algorithm
+
+## version 1.1.8
+
+### Changes
+
+- To convert temperature observations to long-format, the `dcast` function within `run_ensemble` and `cali_ensemble` now uses `mean(..., na.rm = TRUE)` as aggregation function. Previously, this could cause problems in case of non-unique observations (a warning is thrown if these exist).
+- added a check if the mean depth is below 1.5 meters as this could cause the `export_init_cond` function to crash for FLake as `calc_hmix` has a default value of 1.5 m for a minimum depth
+
+## version 1.1.7
+
+### Changes
+
+Bug fixes:
+- Warning message shows up when pre-v1.1 `mass-balance` argument is used, pointing towards a solution when the `outflows` section is missing.
+
+## version 1.1.6
+
+### Changes
+
+Bug fixes:
+- Fixed error in `analyse_ncdf` when ice is not present in the ncdf file and if not enough observational data.
+
+## version 1.1.5
+
+### Changes
+
+Bug fixes:
+- Fixed error in `export_flow` when using a start or stop date that was not included in the inflow or outflow file
+- Fixed bug in `get_output` which would show wrong NA values in Simstrat temperature output due to water level change when including depths in observation files that were not included in the Simstrat output. 
+
+## version 1.1.4
+
+### Changes
+
+Bug fixes:
+- Fixed error in `export_extinction` that caused GOTM to crash because of formating of the datetime column
 
 ## version 1.1.3
 
@@ -25,7 +67,7 @@ Bug fixes:
 ### Changes
 
 Bug fixes:
-- fixed error in formating of Simstrat flow where a flow of 0 would lead to NA in the Simstrat inflow forcing files
+- fixed error in formatting of Simstrat flow where a flow of 0 would lead to NA in the Simstrat inflow forcing files
 
 ## version 1.1.0
 
