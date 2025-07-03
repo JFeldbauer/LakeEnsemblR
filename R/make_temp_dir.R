@@ -24,7 +24,7 @@ make_temp_dir <- function(model, folder = ".", n = 2, tmp_dir = NULL) {
     if(is.null(tmp_dir)) {
       tmp_dir <- tempdir()
     } else {
-      tmp_dir <- file.path(oldwd, tmp_dir)
+      tmp_dir <- tmp_dir
     }
     dir <- file.path(tmp_dir, paste0("n_", n), model)
     unlink(dir, recursive = TRUE, force = TRUE)
