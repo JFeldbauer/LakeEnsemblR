@@ -16,7 +16,7 @@
 #' @return dataframe or list of output variables
 #' @importFrom reshape2 dcast
 #' @importFrom gotmtools get_vari setmodDepths
-#' @importFrom glmtools get_ice get_var
+#' @importFrom glmtools get_var
 #' @importFrom glmtools get_surface_height
 #' @importFrom gotmtools get_yaml_value
 #' @export
@@ -74,8 +74,16 @@ get_output <- function(config_file, model, vars, obs_depths = NULL, folder = "."
     }
 
     if("ice_height" %in% vars){
-      glm_out[[length(glm_out) + 1]] <- get_ice(file = file.path(folder, "GLM", "output",
-                                                                 "output.nc"))
+      ice_glm_w <- get_var(file = file.path(folder, "GLM", "output",
+                                          "output.nc"),
+                           "white_ice_thickness")
+      ice_glm_b <- get_var(file = file.path(folder, "GLM", "output",
+                                            "output.nc"),
+                           "blue_ice_thickness")
+      ice_glm_tot <- data.frame(DateTime = ice_glm_b$DateTime)
+      ice_glm_tot$ice_thickness <- ice_glm_b$blue_ice_thickness +
+        ice_glm_w$white_ice_thickness
+      glm_out[[length(glm_out) + 1]] <- ice_glm_tot
       colnames(glm_out[[length(glm_out)]]) <- c("datetime", "ice_height")
       names(glm_out)[length(glm_out)] <- "ice_height"
 
@@ -343,7 +351,7 @@ get_output <- function(config_file, model, vars, obs_depths = NULL, folder = "."
     ### Convert decimal days to yyyy-mm-dd HH:MM:SS
     par_file <- file.path(folder, gotmtools::get_yaml_value(config_file, "config_files", "Simstrat"))
     timestep <- get_json_value(par_file, "Simulation", "Timestep s")
-    reference_year <- get_json_value(par_file, "Simulation", "Start year")
+    reference_year <- get_json_value(par_file, "Simulation", "Reference year")
 
     sim_out <- list()
 

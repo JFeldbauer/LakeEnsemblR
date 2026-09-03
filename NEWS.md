@@ -1,3 +1,7 @@
+## version 1.2.10
+### Changes
+ - updated to work with GLM 3.3.5 and Simstrat 3.04
+
 ## version 1.2.9
 
 ### Changes

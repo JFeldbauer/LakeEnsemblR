@@ -1,8 +1,8 @@
 Package: LakeEnsemblR
 Type: Package
 Title: Run Ensemble of Lake Models
-Version: 1.2.9
-Date: 2025-03-12
+Version: 1.2.10
+Date: 2026-09-03
 URL: https://github.com/aemon-j/LakeEnsemblR, https://aemon-j.github.io/LakeEnsemblR/
 Authors@R: c(
     person("Tadhg", "Moore", role = c("aut","cre"), 
@@ -49,7 +49,6 @@ Suggests:
 Encoding: UTF-8
 LazyData: true
 LazyLoad: true
-RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 Remotes: 
     github::GLEON/rLakeAnalyzer,
@@ -61,3 +60,4 @@ Remotes:
     github::aemon-j/SimstratR,
     github::aemon-j/MyLakeR
 Config/Needs/website: rmarkdown
+Config/roxygen2/version: 8.0.0

@@ -253,7 +253,7 @@ export_extinction <- function(config_file,
       # Change POSIXct into the Simstrat time format
       Kw_Simstrat <- read.csv(file.path(folder, Kw_simstrat))
       Kw_Simstrat$datetime <- as.POSIXct(Kw_Simstrat$datetime)
-      reference_year <- get_json_value(sim_par, "Simulation", "Start year")
+      reference_year <- get_json_value(sim_par, "Simulation", "Reference year")
       Kw_Simstrat$datetime <- as.numeric(difftime(Kw_Simstrat$datetime,
                                                   as.POSIXct(paste0(reference_year, "-01-01")),
                                                   units = "days"))

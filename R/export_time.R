@@ -112,7 +112,7 @@ export_time <- function(config_file, model = c("GOTM", "GLM", "Simstrat", "FLake
     
     # Set times
     reference_year <- lubridate::year(as.POSIXct(start_date))
-    input_json(sim_par, "Simulation", "Start year", reference_year)
+    input_json(sim_par, "Simulation", "Reference year", reference_year)
     start_date_simulation <- as.POSIXct(start_date)
     end_date_simulation <- as.POSIXct(stop_date)
     input_json(sim_par, "Simulation", "Start d",
